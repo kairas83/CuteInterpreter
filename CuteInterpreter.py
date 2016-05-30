@@ -457,13 +457,8 @@ class CuteInterpreter(object):
 
         elif func_node.type is TokenType.DEFINE:
             expr_rhs1 = rhs1.value
-            if rhs2.value.next is not None:
-                rhs2=self.run_expr(rhs2)
-
+            rhs2 = self.run_expr(rhs2)
             expr_rhs2 = rhs2.value
-
-
-
 
             self.dic[expr_rhs1] = expr_rhs2
 
@@ -479,7 +474,6 @@ class CuteInterpreter(object):
         print self.dic.has_key(id)
 
         if self.dic.has_key(id) is True:
-            print "self.dic["+id+"]:" + self.dic.get(id)
             return Node(TokenType.INT, self.dic[id])
         else:
             return root_node
