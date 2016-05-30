@@ -314,6 +314,7 @@ class BasicPaser(object):
         return head
 
 class CuteInterpreter(object):
+    dic = {}
 
     TRUE_NODE = Node(TokenType.TRUE)
     FALSE_NODE = Node(TokenType.FALSE)
@@ -453,8 +454,26 @@ class CuteInterpreter(object):
                     return rhs1.value.next
 
                 rhs1 = rhs1.next
+
+        elif func_node.type is TokenType.DEFINE:
+            expr_rhs1 = rhs1.value
+            expr_rhs2 = self.run_expr(rhs2)
+
+            print expr_rhs1, expr_rhs2
+
+            self.dic[expr_rhs1] = expr_rhs2
+
+            print self.dic[expr_rhs1]
         else:
             return None
+
+    def run_id(self, root_node):
+        if root_node in self.dic is False:
+            return root_node
+        else:
+            test = Node(TokenType.INT, self.dic.get(root_node))
+            print test
+            return test
 
     def run_expr(self, root_node):
         """
@@ -464,7 +483,7 @@ class CuteInterpreter(object):
             return None
 
         if root_node.type is TokenType.ID:
-            return root_node
+            return self.run_id(root_node)
         elif root_node.type is TokenType.INT:
             return root_node
         elif root_node.type is TokenType.TRUE:
@@ -485,11 +504,13 @@ class CuteInterpreter(object):
 
         if op_code is None:
             return l_node
+        if op_code.type is TokenType.ID:
+            return self.run_id(l_node)
         if op_code.type is TokenType.LIST:
             return self.run_list(op_code)
         if op_code.type in \
                 [TokenType.CAR, TokenType.CDR, TokenType.CONS, TokenType.ATOM_Q,\
-                 TokenType.EQ_Q, TokenType.NULL_Q, TokenType.NOT, TokenType.COND]:
+                 TokenType.EQ_Q, TokenType.NULL_Q, TokenType.NOT, TokenType.COND, TokenType.DEFINE]:
             return self.run_func(op_code)
         if op_code.type is TokenType.QUOTE:
             return l_node
