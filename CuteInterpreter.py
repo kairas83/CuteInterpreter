@@ -233,7 +233,7 @@ class Node (object):
         result = ""
 
         if   self.type is TokenType.ID:
-            result = "["+self.value+"]"
+            result = self.value
         elif self.type is TokenType.INT:
             result = str(self.value)
         elif self.type is TokenType.LIST:
@@ -457,23 +457,26 @@ class CuteInterpreter(object):
 
         elif func_node.type is TokenType.DEFINE:
             expr_rhs1 = rhs1.value
-            expr_rhs2 = self.run_expr(rhs2)
-
-            print expr_rhs1, expr_rhs2
+            expr_rhs2 = rhs2.value
 
             self.dic[expr_rhs1] = expr_rhs2
 
-            print self.dic[expr_rhs1]
+            print self.dic.items()
+
         else:
             return None
 
     def run_id(self, root_node):
-        if root_node in self.dic is False:
-            return root_node
+        id = root_node.value.__str__()
+
+        print self.dic.items()
+        print self.dic.has_key(id)
+
+        if self.dic.has_key(id) is True:
+            print "self.dic["+id+"]:" + self.dic.get(id)
+            return Node(TokenType.INT, self.dic[id])
         else:
-            test = Node(TokenType.INT, self.dic.get(root_node))
-            print test
-            return test
+            return root_node
 
     def run_expr(self, root_node):
         """
@@ -634,5 +637,12 @@ def Test_0517():
 
         print "... "+val
         Test_method(val)
+def Test_0531():
+    dic = { 'b':2 }
+    id2 = 'b'
+    dic[id2] = 3
+    id = 'a'
+    print dic.has_key(id)
+    print dic.get(id2)
 
 Test_0517()
