@@ -47,9 +47,6 @@ def is_type_keyword(token):
         return True
     return False
 
-
-
-
 def _get_keyword_type(token):
     return {
         'define':CuteType.DEFINE,
@@ -457,21 +454,26 @@ class CuteInterpreter(object):
 
         elif func_node.type is TokenType.DEFINE:
             expr_rhs1 = rhs1.value
+
+            if rhs2.type is not TokenType.INT:
+                if rhs2.value.type is TokenType.LAMBDA:
+                    self.dic[rhs1.value.__str__()] = rhs2.value.next.next.value
+                    print self.dic
+                    return
+
             rhs2 = self.run_expr(rhs2)
             expr_rhs2 = rhs2.value
 
             self.dic[expr_rhs1] = expr_rhs2
 
-            print self.dic.items()
+        elif func_node.type is TokenType.LAMBDA:
+            return self.run_expr(rhs2)
 
         else:
             return None
 
     def run_id(self, root_node):
         id = root_node.value.__str__()
-
-        print self.dic.items()
-        print self.dic.has_key(id)
 
         if self.dic.has_key(id) is True:
             return Node(TokenType.INT, self.dic[id])
@@ -513,7 +515,11 @@ class CuteInterpreter(object):
             return self.run_list(op_code)
         if op_code.type in \
                 [TokenType.CAR, TokenType.CDR, TokenType.CONS, TokenType.ATOM_Q,\
-                 TokenType.EQ_Q, TokenType.NULL_Q, TokenType.NOT, TokenType.COND, TokenType.DEFINE]:
+                 TokenType.EQ_Q, TokenType.NULL_Q, TokenType.NOT, TokenType.COND, TokenType.DEFINE, TokenType.LAMBDA]:
+
+            if l_node.next is not None:
+                self.dic[op_code.next.value.__str__()] = l_node.next.__str__()
+
             return self.run_func(op_code)
         if op_code.type is TokenType.QUOTE:
             return l_node
